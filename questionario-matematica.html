@@ -1,0 +1,3507 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulado SAEB — Matemática · 3ª Série</title>
+<style>
+  :root {
+    --ink: #1c2430;
+    --muted: #5b6775;
+    --line: #d7dde5;
+    --bg: #f3f6f9;
+    --card: #ffffff;
+    --accent: #0b6e4f;
+    --accent-soft: #e6f4ee;
+    --wrong: #b42318;
+    --wrong-soft: #fdecea;
+    --ok: #067647;
+    --ok-soft: #e8f8ef;
+    --warn: #b54708;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(1200px 500px at 10% -10%, #d9efe6 0%, transparent 55%),
+      radial-gradient(900px 400px at 100% 0%, #e7eef8 0%, transparent 50%),
+      var(--bg);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 820px; margin: 0 auto; padding: 28px 18px 120px; }
+  .hero {
+    background: linear-gradient(135deg, #0b6e4f, #14532d 55%, #1f3a5f);
+    color: #fff;
+    border-radius: 20px;
+    padding: 28px 26px;
+    box-shadow: 0 16px 40px rgba(11, 40, 30, 0.18);
+    margin-bottom: 22px;
+  }
+  .hero h1 { margin: 0 0 8px; font-size: clamp(1.4rem, 3vw, 1.9rem); letter-spacing: -0.02em; }
+  .hero p { margin: 0; opacity: 0.92; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .chip {
+    background: rgba(255,255,255,0.14);
+    border: 1px solid rgba(255,255,255,0.22);
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+  }
+  .toolbar {
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: blur(10px);
+    background: rgba(243,246,249,0.86);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .progress { font-weight: 600; color: var(--muted); }
+  .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    appearance: none; border: 0; cursor: pointer;
+    border-radius: 10px; padding: 10px 14px; font-weight: 650;
+    font-size: 0.95rem;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-secondary { background: #e8eef5; color: var(--ink); }
+  .btn-ghost { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 20px 20px 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 0 rgba(16,24,40,0.02);
+  }
+  .card[hidden] { display: none !important; }
+  .card.is-correct { border-color: #86efac; background: linear-gradient(#fff, var(--ok-soft)); }
+  .card.is-wrong { border-color: #fca5a5; background: linear-gradient(#fff, var(--wrong-soft)); }
+  .qhead { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; margin-bottom: 10px; }
+  .num { font-weight: 800; color: var(--accent); }
+  .code { font-size: 0.8rem; color: var(--muted); }
+  .stem { margin-bottom: 12px; }
+  .stem-note { margin: 0; color: var(--muted); font-size: 0.92rem; }
+  .fig { margin: 12px 0 16px; }
+  .fig img {
+    width: 100%; max-width: 720px; height: auto;
+    border: 1px solid var(--line); border-radius: 12px; background: #fff;
+    display: block;
+  }
+  .options { display: grid; gap: 8px; }
+  .options:has(.letter-only) {
+    grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  }
+  .opt {
+    display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start;
+    border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px;
+    cursor: pointer; background: #fbfdff;
+  }
+  .opt.letter-only {
+    grid-template-columns: 1fr;
+    place-items: center;
+    min-height: 48px;
+  }
+  .opt:hover { border-color: #9ecdbb; background: var(--accent-soft); }
+  .opt:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+  .opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .letter {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: grid; place-items: center; font-weight: 800; font-size: 0.85rem;
+    background: #e8eef5; color: var(--ink);
+  }
+  .opt:has(input:checked) .letter { background: var(--accent); color: #fff; }
+  .feedback {
+    margin-top: 12px; padding: 10px 12px; border-radius: 10px; font-weight: 650;
+  }
+  .feedback.ok { background: var(--ok-soft); color: var(--ok); }
+  .feedback.bad { background: var(--wrong-soft); color: var(--wrong); }
+  .feedback.skip { background: #fff7ed; color: var(--warn); }
+  .result {
+    display: none; margin-top: 18px; padding: 18px 20px; border-radius: 16px;
+    background: #fff; border: 1px solid var(--line);
+  }
+  .result.show { display: block; }
+  .result h2 { margin: 0 0 8px; }
+  .score { font-size: 2rem; font-weight: 800; color: var(--accent); }
+  footer.note { margin-top: 24px; color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <h1>Simulado SAEB — Matemática</h1>
+      <p>3ª Série · Prova com 25 questões sorteadas de um banco com 103 itens (4 simulados). Cada acesso (ou “Nova prova”) gera um conjunto diferente.</p>
+      <div class="meta">
+        <span class="chip">25 questões por prova</span>
+        <span class="chip">Banco: 103</span>
+        <span class="chip">Correção automática</span>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <div class="progress"><span id="answered">0</span> / <span id="totalLabel">25</span> respondidas</div>
+      <div class="btns">
+        <button type="button" class="btn-ghost" id="btnNew">Nova prova</button>
+        <button type="button" class="btn-ghost" id="btnClear">Limpar</button>
+        <button type="button" class="btn-secondary" id="btnReveal">Mostrar gabarito</button>
+        <button type="button" class="btn-primary" id="btnCheck">Corrigir</button>
+      </div>
+    </div>
+
+    <form id="quiz">
+      
+    <article class="card" data-id="ORIG_Q27" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_027</span>
+      </header>
+      <div class="stem">A gerência de uma fábrica de doces planeja a embalagem de uma nova linha de produtos. Um lote de 720 caramelos deverá ser totalmente embalado em caixas, de forma que cada caixa contenha a mesma quantidade de caramelos. Por questões de logística e custo, a quantidade de caramelos por caixa deve ser no mínimo 5 e no máximo 50.<br><br>De acordo com essas condições, a quantidade de maneiras distintas que os caramelos podem ser distribuídos nas caixas é:</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q27" value="A">
+          <span class="letter">A</span>
+          <span class="text">12.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q27" value="B">
+          <span class="letter">B</span>
+          <span class="text">14.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q27" value="C">
+          <span class="letter">C</span>
+          <span class="text">16.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q27" value="D">
+          <span class="letter">D</span>
+          <span class="text">18.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q27" value="E">
+          <span class="letter">E</span>
+          <span class="text">20.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q28" data-answer="B" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_030</span>
+      </header>
+      <div class="stem">Durante o planejamento do design de uma logomarca, uma equipe de designers gráficos analisou diversas formas geométricas. Um dos modelos considerados foi baseado em um polígono convexo regular com 12 lados e que deve ter linhas conectando pares de vértices não consecutivos para criar um padrão geométrico elegante e simétrico.<br><br>O número total de conexões para a criação da logomarca será igual a:</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q28" value="A">
+          <span class="letter">A</span>
+          <span class="text">48.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q28" value="B">
+          <span class="letter">B</span>
+          <span class="text">54.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q28" value="C">
+          <span class="letter">C</span>
+          <span class="text">60.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q28" value="D">
+          <span class="letter">D</span>
+          <span class="text">108.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q28" value="E">
+          <span class="letter">E</span>
+          <span class="text">120.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q29" data-answer="A" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_029</span>
+      </header>
+      <div class="stem">Um dos formatos de bloco de concreto para pisos intertravados é o sextavado (ou hexagonal), indicado para pavimentação de áreas industriais, condomínios e ruas.<br><br>Como em outros formatos, as peças são assentadas sobre um colchão de areia e travadas por um encaixe em bloqueios laterais a partir de guias, muros ou sarjetas, conforme mostra a imagem.<br><br>Considerando que cada peça é um hexágono regular com a área de 10,2 cm² e que √3 ≈ 1,7, o perímetro de cada bloco será, em centímetros, igual a:</div>
+      <figure class="fig"><img src="imgs/q29_hexagonos.png" alt="Questão ORIG_Q29" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q29" value="A">
+          <span class="letter">A</span>
+          <span class="text">12.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q29" value="B">
+          <span class="letter">B</span>
+          <span class="text">18.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q29" value="C">
+          <span class="letter">C</span>
+          <span class="text">24.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q29" value="D">
+          <span class="letter">D</span>
+          <span class="text">30.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q29" value="E">
+          <span class="letter">E</span>
+          <span class="text">36.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q30" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">ENEM2025_MAT-N-160</span>
+      </header>
+      <div class="stem">O calendário maia apresenta duas contagens simultâneas de anos, o chamado ano Tzolkim, composto por 260 dias e que determinava o calendário religioso, e o ano Haab, composto por 365 dias e que determinava o calendário agrícola. Um historiador encontrou evidências de que gerações de uma mesma família governaram certa comunidade maia pelo período de 20 ciclos, sendo cada ciclo formado por 52 anos Haab.<br><br>De acordo com as informações fornecidas, durante quantos anos Tzolkim aquela comunidade maia foi governada por tal família?</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q30" value="A">
+          <span class="letter">A</span>
+          <span class="text">741</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q30" value="B">
+          <span class="letter">B</span>
+          <span class="text">1 040</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q30" value="C">
+          <span class="letter">C</span>
+          <span class="text">1 460</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q30" value="D">
+          <span class="letter">D</span>
+          <span class="text">2 100</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q30" value="E">
+          <span class="letter">E</span>
+          <span class="text">5 200</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q31" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_031</span>
+      </header>
+      <div class="stem">Um reservatório, em formato de paralelepípedo retângulo, será construído em uma comunidade rural para armazenar água da chuva. O projeto prevê que o reservatório tenha 4 metros de comprimento, 2,5 metros de largura e 5 metros de altura.<br><br>Ao avaliar as necessidades da comunidade, foi estimado que cada família consome cerca de 500 litros de água por dia.<br><br>Considerando que 1 m³ = 1 000 L, por quantos dias esse reservatório pode abastecer 5 famílias?</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q31" value="A">
+          <span class="letter">A</span>
+          <span class="text">2 dias.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q31" value="B">
+          <span class="letter">B</span>
+          <span class="text">10 dias.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q31" value="C">
+          <span class="letter">C</span>
+          <span class="text">20 dias.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q31" value="D">
+          <span class="letter">D</span>
+          <span class="text">50 dias.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q31" value="E">
+          <span class="letter">E</span>
+          <span class="text">200 dias.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q32" data-answer="B" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_032</span>
+      </header>
+      <div class="stem">Cláudio está concluindo seu curso de Arquitetura e vai projetar uma cobertura de vidro para a entrada de um prédio comercial. A cobertura terá a forma de um paralelepípedo retângulo aberto na base, com 4 metros de comprimento, 2,5 metros de largura e 0,5 metro de altura. Para calcular o custo do projeto, Cláudio precisa saber a área total de vidro a ser utilizada, desconsiderando a base.<br><br>Qual será a área total de vidro necessária?</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q32" value="A">
+          <span class="letter">A</span>
+          <span class="text">5 m².</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q32" value="B">
+          <span class="letter">B</span>
+          <span class="text">16,5 m².</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q32" value="C">
+          <span class="letter">C</span>
+          <span class="text">26,5 m².</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q32" value="D">
+          <span class="letter">D</span>
+          <span class="text">39 m².</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q32" value="E">
+          <span class="letter">E</span>
+          <span class="text">50 m².</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q33" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_033</span>
+      </header>
+      <div class="stem">Um engenheiro civil está planejando a construção de uma ponte para pedestres. O projeto prevê que a ponte terá um comprimento total de 40 metros. Por questões de segurança e estrutura, é necessário prever uma margem de 2,5 m em cada uma das duas extremidades da ponte, para acomodar juntas de dilatação e pilares de sustentação. Para apresentar o projeto, o engenheiro traçará a planta da ponte em uma escala de 1:150.<br><br>Sendo assim, na planta, o comprimento total da ponte, incluindo as margens de segurança, deverá ser, em centímetros, igual a:</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q33" value="A">
+          <span class="letter">A</span>
+          <span class="text">25.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q33" value="B">
+          <span class="letter">B</span>
+          <span class="text">28.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q33" value="C">
+          <span class="letter">C</span>
+          <span class="text">30.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q33" value="D">
+          <span class="letter">D</span>
+          <span class="text">32.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q33" value="E">
+          <span class="letter">E</span>
+          <span class="text">35.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q34" data-answer="D" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">ENEM2011_MAT-E-025</span>
+      </header>
+      <div class="stem">Muitas medidas podem ser tomadas em nossas casas visando à utilização racional de energia elétrica. Isso deve ser uma atitude diária de cidadania. Uma delas pode ser a redução do tempo no banho. Um chuveiro com potência de 4 800 W (4,8 kW) consome 4,8 kWh de energia por hora de funcionamento. Uma pessoa que toma dois banhos diariamente, de 10 minutos cada, consumirá, em sete dias, quantos kWh?</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q34" value="A">
+          <span class="letter">A</span>
+          <span class="text">0,8</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q34" value="B">
+          <span class="letter">B</span>
+          <span class="text">1,6</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q34" value="C">
+          <span class="letter">C</span>
+          <span class="text">5,6</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q34" value="D">
+          <span class="letter">D</span>
+          <span class="text">11,2</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q34" value="E">
+          <span class="letter">E</span>
+          <span class="text">33,6</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q35" data-answer="D" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_034</span>
+      </header>
+      <div class="stem">Segundo o Pacto pela Restauração da Mata Atlântica, o Brasil possui cerca de 12 milhões de hectares de áreas degradadas com potencial para reflorestamento apenas neste bioma. Estudos indicam que cada hectare reflorestado pode absorver, em média, 15 toneladas de CO₂ por ano durante as primeiras duas décadas após o plantio. Além disso, a densidade média recomendada é de 1 667 mudas por hectare, com espaçamento de 3 metros entre plantas.<br><br>Um projeto de restauração florestal em uma área de proteção ambiental identificou uma região degradada com formato irregular. Após levantamento topográfico, verificou-se que essa área pode ser semelhante a um polígono composto por um retângulo de dimensões 400 m × 250 m, que se conecta a um triângulo retângulo com catetos de 250 m e 180 m.<br><br>Quantas toneladas de CO₂ serão absorvidas por ano nas primeiras duas décadas após o reflorestamento total dessa região?<br><br>(Considere que cada hectare é equivalente a 10 000 m²)</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q35" value="A">
+          <span class="letter">A</span>
+          <span class="text">33,75 toneladas de CO₂.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q35" value="B">
+          <span class="letter">B</span>
+          <span class="text">108,75 toneladas de CO₂.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q35" value="C">
+          <span class="letter">C</span>
+          <span class="text">150 toneladas de CO₂.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q35" value="D">
+          <span class="letter">D</span>
+          <span class="text">183,75 toneladas de CO₂.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q35" value="E">
+          <span class="letter">E</span>
+          <span class="text">217,5 toneladas de CO₂.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q36" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_035</span>
+      </header>
+      <div class="stem">Uma empresa especializada em componentes para energia renovável está fabricando arruelas metálicas para uso em turbinas eólicas. Para otimizar o processo de fabricação e identificar o custo de material para a produção, a equipe de engenharia precisa calcular com precisão a área de metal utilizada em cada arruela.<br><br>Sabe-se que o diâmetro externo da arruela é de 12 cm e o diâmetro interno é de 4 cm. O material utilizado é uma liga de aço inoxidável que custa R$ 0,08 por cm² de chapa metálica.<br><br>Considere 3,14 como aproximação para π. Qual é o custo aproximado do material necessário para se produzir uma unidade de arruela?</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q36" value="A">
+          <span class="letter">A</span>
+          <span class="text">R$ 10,24.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q36" value="B">
+          <span class="letter">B</span>
+          <span class="text">R$ 9,04.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q36" value="C">
+          <span class="letter">C</span>
+          <span class="text">R$ 8,04.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q36" value="D">
+          <span class="letter">D</span>
+          <span class="text">R$ 4,02.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q36" value="E">
+          <span class="letter">E</span>
+          <span class="text">R$ 2,01.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q37" data-answer="B" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_036</span>
+      </header>
+      <div class="stem">Uma prefeitura está organizando um evento cultural em uma praça e, para delimitar a área onde ocorrerão as apresentações musicais, foi montado um palco no formato de um quadrilátero. No gráfico a seguir, estão indicados os pontos que correspondem aos vértices do palco em um plano cartesiano (todas as medidas em metros).<br><br>A equipe de segurança precisa calcular o perímetro desse palco para instalar a grade de proteção em torno dele.<br><br>O perímetro do quadrilátero PQRS, em metros, é:</div>
+      <figure class="fig"><img src="imgs/q37_grafico.png" alt="Questão ORIG_Q37" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q37" value="A">
+          <span class="letter">A</span>
+          <span class="text">4 + √10 + 2√13.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q37" value="B">
+          <span class="letter">B</span>
+          <span class="text">4 + √10 + 2√17.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q37" value="C">
+          <span class="letter">C</span>
+          <span class="text">2√10 + √17 + 2.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q37" value="D">
+          <span class="letter">D</span>
+          <span class="text">√10 + √13 + 6.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q37" value="E">
+          <span class="letter">E</span>
+          <span class="text">√3 + 2√10 + √5.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q38" data-answer="D" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_037</span>
+      </header>
+      <div class="stem">Pesquisadores vêm desenvolvendo painéis solares parabólicos para concentrar os raios do Sol em um ponto específico, a fim de aumentar a eficiência na geração de energia. Esses refletores são moldados de acordo com curvas parabólicas, pois esse formato permite que a luz solar seja direcionada ao foco, onde geralmente se posiciona o receptor de energia.<br><br>Um engenheiro está projetando um desses painéis, cuja seção transversal é representada no gráfico a seguir, em que os eixos estão em centímetros e a função parabólica que descreve a borda do refletor é:<br><br><strong>f(x) = −(1/20)(x² − 40x + 144)</strong><br><br>No gráfico, a parábola intercepta o eixo x nos pontos x = 4 e x = 36, e o ponto mais alto da curva representa a altura máxima H, medida a partir da base até a borda superior do painel, no centro da parábola.<br><br>Para que o painel solar seja construído adequadamente, a medida de H, em centímetros, deve ser:</div>
+      <figure class="fig"><img src="imgs/q38_parabola.png" alt="Questão ORIG_Q38" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q38" value="A">
+          <span class="letter">A</span>
+          <span class="text">16,6.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q38" value="B">
+          <span class="letter">B</span>
+          <span class="text">18,4.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q38" value="C">
+          <span class="letter">C</span>
+          <span class="text">12,4.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q38" value="D">
+          <span class="letter">D</span>
+          <span class="text">12,8.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q38" value="E">
+          <span class="letter">E</span>
+          <span class="text">16,4.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q39" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_038</span>
+      </header>
+      <div class="stem">Um engenheiro elétrico está monitorando o consumo de energia de um prédio em construção. Para simplificar a análise, ele observa que o consumo diário de energia elétrica segue uma progressão linear ao longo dos primeiros dias do mês. Ele registrou os seguintes dados: no 5º dia do mês, o consumo total acumulado era de 45 kWh e, no 25º dia, o consumo acumulado atingiu 125 kWh.<br><br>Com base nessas informações, qual será o consumo total acumulado de energia elétrica, em kWh, no 15º dia do mês?</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q39" value="A">
+          <span class="letter">A</span>
+          <span class="text">75.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q39" value="B">
+          <span class="letter">B</span>
+          <span class="text">80.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q39" value="C">
+          <span class="letter">C</span>
+          <span class="text">85.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q39" value="D">
+          <span class="letter">D</span>
+          <span class="text">90.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q39" value="E">
+          <span class="letter">E</span>
+          <span class="text">95.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q40" data-answer="E" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_039</span>
+      </header>
+      <div class="stem">Um pesquisador estuda uma colônia de bactérias que está em um recipiente. A cada 4 horas, a quantidade de bactérias se multiplica por 5. O experimento foi iniciado com 80 bactérias. Para evitar que a colônia comprometa o ambiente, será aplicado o produto químico Y, que deve ser utilizado de uma única vez em quantidade suficiente para eliminar até 1,25 milhão de bactérias, considerando a proporção de 1 ml de produto para cada 50 000 bactérias.<br><br>Sabendo que o pesquisador dispõe exatamente da quantidade de produto necessária para o limite máximo da população, após quantas horas do início do experimento o produto Y deverá ser aplicado?</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q40" value="A">
+          <span class="letter">A</span>
+          <span class="text">6</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q40" value="B">
+          <span class="letter">B</span>
+          <span class="text">12.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q40" value="C">
+          <span class="letter">C</span>
+          <span class="text">16.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q40" value="D">
+          <span class="letter">D</span>
+          <span class="text">20.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q40" value="E">
+          <span class="letter">E</span>
+          <span class="text">24.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q41" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_040</span>
+      </header>
+      <div class="stem">As ondas eletromagnéticas usadas para comunicações sem fio correspondem à energia transportada através do espaço, na velocidade da luz, na forma de campo elétrico e magnético. A quantidade de energia associada à onda eletromagnética depende de suas frequências, as quais são medidas pelo número de oscilações (ciclos) por segundo.<br><br>Um pesquisador estava manipulando expressões que envolviam ondas sonoras com o objetivo de encontrar a amplitude que representava essa onda e, para determinado fenômeno, calculou a solução da equação:<br><br><strong>2 sen(x) · cos(x) + cos(x) = 0</strong><br><br>Sabendo que apenas soluções no intervalo [0, 2π] eram suficientes para a análise do pesquisador, quantas soluções ele encontrou para a equação?</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q41" value="A">
+          <span class="letter">A</span>
+          <span class="text">2.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q41" value="B">
+          <span class="letter">B</span>
+          <span class="text">3.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q41" value="C">
+          <span class="letter">C</span>
+          <span class="text">4.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q41" value="D">
+          <span class="letter">D</span>
+          <span class="text">5.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q41" value="E">
+          <span class="letter">E</span>
+          <span class="text">6.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q42" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">ENEM2025_MAT-N-152</span>
+      </header>
+      <div class="stem">A final de um campeonato de futebol foi disputada em 2 tempos regulamentares, de 45 minutos cada, sem acréscimos, com uma prorrogação de 30 minutos, também sem acréscimos. Um jogador entrou no início do segundo tempo, com um equipamento para medir a distância percorrida durante sua participação no jogo. Ao final do segundo tempo, esse jogador havia percorrido 4,5 km. Ele manteve na prorrogação a mesma velocidade média que havia mantido no segundo tempo regulamentar.<br><br>A distância percorrida por esse jogador durante sua participação na partida, em quilômetro, foi:</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q42" value="A">
+          <span class="letter">A</span>
+          <span class="text">6,0</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q42" value="B">
+          <span class="letter">B</span>
+          <span class="text">6,5</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q42" value="C">
+          <span class="letter">C</span>
+          <span class="text">7,5</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q42" value="D">
+          <span class="letter">D</span>
+          <span class="text">9,0</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q42" value="E">
+          <span class="letter">E</span>
+          <span class="text">10,5</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q43" data-answer="B" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_041</span>
+      </header>
+      <div class="stem">Uma reserva ambiental está enfrentando um grave problema com a proliferação de uma planta aquática invasora em seu principal lago, que tem 16 384 m². Se a cobertura atingir 512 m² da superfície do lago, ele estará em estado crítico, com severa redução de oxigênio na água e ameaça à sobrevivência de espécies nativas.<br><br>O modelo matemático que descreve o crescimento dessa área é dado por A(t) = 2<sup>kt</sup>, em que A(t) é a área coberta em m² após t meses desde a detecção inicial e k é a taxa de crescimento mensal. A área coberta por essa planta no momento da detecção inicial, há 24 meses, era de apenas 1 m² da superfície do lago. Atualmente, a cobertura já atingiu 16 m².<br><br>Uma estratégia de controle precisa ser aplicada, necessariamente, em:</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q43" value="A">
+          <span class="letter">A</span>
+          <span class="text">menos de um mês.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q43" value="B">
+          <span class="letter">B</span>
+          <span class="text">até 30 meses.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q43" value="C">
+          <span class="letter">C</span>
+          <span class="text">até 54 meses.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q43" value="D">
+          <span class="letter">D</span>
+          <span class="text">até 60 meses.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q43" value="E">
+          <span class="letter">E</span>
+          <span class="text">até 84 meses.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q44" data-answer="B" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_042</span>
+      </header>
+      <div class="stem">Em uma festa de aniversário, uma pessoa consumiu uma unidade de cada um dos três alimentos menos calóricos da lista a seguir:<br><br><table class="data"><thead><tr><th>Alimentos e Bebidas</th><th>Porção</th><th>Calorias (kcal)</th></tr></thead><tbody><tr><td>Bolo de chocolate</td><td>1</td><td>420</td></tr><tr><td>Refrigerante (copo)</td><td>1</td><td>140</td></tr><tr><td>Pastel de carne</td><td>1</td><td>310</td></tr><tr><td>Coxinha</td><td>1</td><td>280</td></tr><tr><td>Brigadeiro</td><td>1</td><td>120</td></tr><tr><td>Pipoca</td><td>1</td><td>95</td></tr><tr><td>Suco natural</td><td>1</td><td>150</td></tr><tr><td>Salgadinho de pacote</td><td>1</td><td>200</td></tr></tbody></table><br>Considerando o consumo descrito, a média de calorias (kcal) por unidade ingerida por essa pessoa foi igual a:</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q44" value="A">
+          <span class="letter">A</span>
+          <span class="text">115.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q44" value="B">
+          <span class="letter">B</span>
+          <span class="text">118</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q44" value="C">
+          <span class="letter">C</span>
+          <span class="text">125.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q44" value="D">
+          <span class="letter">D</span>
+          <span class="text">130.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q44" value="E">
+          <span class="letter">E</span>
+          <span class="text">135.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q45" data-answer="B" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_043</span>
+      </header>
+      <div class="stem">Das 21 temporadas que finalizou, LeBron passou dos dois mil pontos 16 vezes. O recorde foi em 2017/18, quando levou o Cleveland Cavaliers ao vice-campeonato e totalizou 2 999 pontos. Na série decisiva contra o Golden State Warriors, ele teve média de 34 pontos e sua melhor pontuação em uma só partida de playoffs (51).<br><br>A mediana de pontuação de LeBron James por temporada na NBA, desde o momento em que estabeleceu seu recorde anual de pontos até o período mais atual, foi aproximadamente de:</div>
+      <figure class="fig"><img src="imgs/q45_lebron.png" alt="Questão ORIG_Q45" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q45" value="A">
+          <span class="letter">A</span>
+          <span class="text">1 492.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q45" value="B">
+          <span class="letter">B</span>
+          <span class="text">1 840.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q45" value="C">
+          <span class="letter">C</span>
+          <span class="text">1 895.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q45" value="D">
+          <span class="letter">D</span>
+          <span class="text">2 144.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q45" value="E">
+          <span class="letter">E</span>
+          <span class="text">2 198.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q46" data-answer="D" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_044</span>
+      </header>
+      <div class="stem">Uma pesquisa de intenção de voto foi realizada em uma cidade com 10 000 eleitores. Foram entrevistados 1 000 eleitores e os resultados obtidos estão resumidos a seguir:<ul><li>Candidato A: 42%</li><li>Candidato B: 38%</li><li>Indecisos: 5%</li><li>Brancos, nulos e outros: 15%</li></ul>O instituto responsável afirmou que a pesquisa tem margem de erro de ±3 pontos percentuais, com nível de confiança de 95%.<br><br>Com base nesses dados, é estatisticamente correto afirmar que o candidato A está matematicamente à frente do candidato B?</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q46" value="A">
+          <span class="letter">A</span>
+          <span class="text">Sim, pois a pesquisa foi feita com 10% da população.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q46" value="B">
+          <span class="letter">B</span>
+          <span class="text">Sim, pois a diferença de 4 pontos é superior à margem de erro.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q46" value="C">
+          <span class="letter">C</span>
+          <span class="text">Não, pois o número de indecisos é maior que a margem de erro.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q46" value="D">
+          <span class="letter">D</span>
+          <span class="text">Não, pois os intervalos de confiança de A e B podem se sobrepor.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q46" value="E">
+          <span class="letter">E</span>
+          <span class="text">Sim, pois o candidato A obteve mais de 40% das intenções de voto.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q47" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">ENEM2021_MAT-N-170</span>
+      </header>
+      <div class="stem">Em um estudo realizado pelo IBGE em quatro estados e no Distrito Federal, com mais de 5 mil pessoas com 10 anos ou mais, observou-se que a leitura ocupa, em média, apenas seis minutos do dia de cada pessoa. Na faixa de idade de 10 a 24 anos, a média diária é de três minutos. No entanto, no grupo de idades entre 24 e 60 anos, o tempo médio diário dedicado à leitura é de 5 minutos. Entre os mais velhos, com 60 anos ou mais, a média é de 12 minutos.<br><br><table class="data"><thead><tr><th>Faixa etária</th><th>Percentual de entrevistados</th></tr></thead><tbody><tr><td>De 10 a 24 anos</td><td>x</td></tr><tr><td>Entre 24 e 60 anos</td><td>y</td></tr><tr><td>A partir de 60 anos</td><td>x</td></tr></tbody></table><br>A quantidade de pessoas entrevistadas de cada faixa de idade seguiu a distribuição percentual descrita no quadro.<br><br>Os valores de x e y do quadro são, respectivamente, iguais a:</div>
+      
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q47" value="A">
+          <span class="letter">A</span>
+          <span class="text">10 e 80.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q47" value="B">
+          <span class="letter">B</span>
+          <span class="text">10 e 90.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q47" value="C">
+          <span class="letter">C</span>
+          <span class="text">20 e 60.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q47" value="D">
+          <span class="letter">D</span>
+          <span class="text">20 e 80.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q47" value="E">
+          <span class="letter">E</span>
+          <span class="text">25 e 50.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q48" data-answer="A" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">2025_MAT_EM_045</span>
+      </header>
+      <div class="stem">Uma empresa de jornalismo fez uma pesquisa com 805 entrevistados, a fim de conhecer seus hábitos de consumo de informações. Sabe-se que os entrevistados foram orientados a escolher apenas uma resposta. O gráfico a seguir apresenta uma das informações obtidas nessa pesquisa.<br><br>A quantidade aproximada de pessoas que votaram na opção que teve a menor frequência de respostas foi de:</div>
+      <figure class="fig"><img src="imgs/q48_noticias.png" alt="Questão ORIG_Q48" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q48" value="A">
+          <span class="letter">A</span>
+          <span class="text">105.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q48" value="B">
+          <span class="letter">B</span>
+          <span class="text">137.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q48" value="C">
+          <span class="letter">C</span>
+          <span class="text">161.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q48" value="D">
+          <span class="letter">D</span>
+          <span class="text">181.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q48" value="E">
+          <span class="letter">E</span>
+          <span class="text">221.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q49" data-answer="B" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">ENEM2024_MAT-N-155</span>
+      </header>
+      <div class="stem">Uma professora de matemática utiliza em suas aulas uma “máquina caça-números” para verificar os conhecimentos de seus estudantes sobre representações de números racionais. Essa máquina tem um visor dividido em seis compartimentos e, na lateral, uma alavanca. Cada estudante puxa a alavanca e espera que os compartimentos parem de girar. A partir daí, precisa responder para a professora em quais posições se encontram os números que representam a mesma quantidade. Um estudante puxou a alavanca, aguardou que os compartimentos parassem de girar e observou os números apresentados no visor. A configuração da máquina naquele instante está apresentada na imagem.<br><br>Esse estudante respondeu corretamente à pergunta da professora. As posições indicadas pelo estudante foram:</div>
+      <figure class="fig"><img src="imgs/q49_visor.png" alt="Questão ORIG_Q49" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q49" value="A">
+          <span class="letter">A</span>
+          <span class="text">I, II e IV.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q49" value="B">
+          <span class="letter">B</span>
+          <span class="text">II, IV e V.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q49" value="C">
+          <span class="letter">C</span>
+          <span class="text">II, III e V.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q49" value="D">
+          <span class="letter">D</span>
+          <span class="text">III, V e VI.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q49" value="E">
+          <span class="letter">E</span>
+          <span class="text">III, IV e VI.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q50" data-answer="D" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">ENEM2021_MAT-N-171</span>
+      </header>
+      <div class="stem">Uma pessoa realizou uma pesquisa com alguns alunos de uma escola, coletando suas idades, e organizou esses dados no gráfico.<br><br>Qual é a média das idades, em ano, desses alunos?</div>
+      <figure class="fig"><img src="imgs/q50_idades.png" alt="Questão ORIG_Q50" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q50" value="A">
+          <span class="letter">A</span>
+          <span class="text">9</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q50" value="B">
+          <span class="letter">B</span>
+          <span class="text">12</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q50" value="C">
+          <span class="letter">C</span>
+          <span class="text">18</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q50" value="D">
+          <span class="letter">D</span>
+          <span class="text">19</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q50" value="E">
+          <span class="letter">E</span>
+          <span class="text">27</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q51" data-answer="A" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">ENEM2022_MAT-N-165</span>
+      </header>
+      <div class="stem">Uma empresa de engenharia projetou uma casa com a forma de um retângulo para um de seus clientes. Esse cliente solicitou a inclusão de uma varanda em forma de L. A figura apresenta a planta baixa desenhada pela empresa, já com a varanda incluída, cujas medidas indicadas em centímetro representam os valores das dimensões da varanda na escala de 1:50.<br><br>A medida real da área da varanda, em metro quadrado, é:</div>
+      <figure class="fig"><img src="imgs/q51_varanda.png" alt="Questão ORIG_Q51" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q51" value="A">
+          <span class="letter">A</span>
+          <span class="text">33,40.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q51" value="B">
+          <span class="letter">B</span>
+          <span class="text">66,80.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q51" value="C">
+          <span class="letter">C</span>
+          <span class="text">89,24.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q51" value="D">
+          <span class="letter">D</span>
+          <span class="text">133,60.</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q51" value="E">
+          <span class="letter">E</span>
+          <span class="text">534,40.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="ORIG_Q52" data-answer="C" data-source="ORIG" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">ENEM2023_MAT-N-162</span>
+      </header>
+      <div class="stem">O mastro de uma bandeira foi instalado perpendicularmente ao solo em uma região plana. Devido aos fortes ventos, três cabos de aço, de mesmo comprimento, serão instalados para dar sustentação ao mastro. Cada cabo de aço ficará perfeitamente esticado, com uma extremidade num ponto P do mastro, a uma altura h do solo, e a outra extremidade, num ponto no chão, como mostra a figura.<br><br>Os cabos de aço formam um ângulo α com o plano do chão. Por medida de segurança, há apenas três opções de instalação:<ul><li>Opção I: h = 11 m e α = 30º;</li><li>Opção II: h = 12 m e α = 45º;</li><li>Opção III: h = 18 m e α = 60º.</li></ul>A opção a ser escolhida é aquela em que a medida dos cabos seja a menor possível. Qual será a medida, em metro, de cada um dos cabos a serem instalados?</div>
+      <figure class="fig"><img src="imgs/q52_cabos.png" alt="Questão ORIG_Q52" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt">
+          <input type="radio" name="ORIG_Q52" value="A">
+          <span class="letter">A</span>
+          <span class="text">(22√3)/3</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q52" value="B">
+          <span class="letter">B</span>
+          <span class="text">11√2</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q52" value="C">
+          <span class="letter">C</span>
+          <span class="text">12√2</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q52" value="D">
+          <span class="letter">D</span>
+          <span class="text">12√3</span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="ORIG_Q52" value="E">
+          <span class="letter">E</span>
+          <span class="text">22.</span>
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q01" data-answer="B" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_001</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q01.png" alt="Questão S1_Q01" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q01" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q01" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q01" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q01" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q02" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_002</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q02.png" alt="Questão S1_Q02" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q02" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q02" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q02" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q02" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q03" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_003</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q03.png" alt="Questão S1_Q03" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q03" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q03" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q03" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q03" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q04" data-answer="D" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_004</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q04.png" alt="Questão S1_Q04" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q04" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q04" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q04" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q04" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q05" data-answer="B" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_005</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q05.png" alt="Questão S1_Q05" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q05" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q05" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q05" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q05" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q06" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_006</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q06.png" alt="Questão S1_Q06" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q06" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q06" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q06" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q06" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q07" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_007</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q07.png" alt="Questão S1_Q07" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q07" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q07" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q07" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q07" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q08" data-answer="B" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_008</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q08.png" alt="Questão S1_Q08" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q08" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q08" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q08" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q08" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q09" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_009</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q09.png" alt="Questão S1_Q09" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q09" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q09" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q09" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q09" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q10" data-answer="B" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_010</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q10.png" alt="Questão S1_Q10" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q10" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q10" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q10" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q10" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q11" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_011</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q11.png" alt="Questão S1_Q11" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q11" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q11" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q11" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q11" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q12" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_012</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q12.png" alt="Questão S1_Q12" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q12" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q12" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q12" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q12" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q13" data-answer="B" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_013</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q13.png" alt="Questão S1_Q13" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q13" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q13" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q13" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q13" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q14" data-answer="B" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_014</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q14.png" alt="Questão S1_Q14" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q14" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q14" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q14" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q14" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q15" data-answer="D" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_015</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q15.png" alt="Questão S1_Q15" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q15" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q15" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q15" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q15" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q16" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_016</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q16.png" alt="Questão S1_Q16" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q16" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q16" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q16" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q16" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q17" data-answer="B" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_017</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q17.png" alt="Questão S1_Q17" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q17" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q17" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q17" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q17" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q18" data-answer="A" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_018</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q18.png" alt="Questão S1_Q18" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q18" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q18" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q18" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q18" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q19" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_019</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q19.png" alt="Questão S1_Q19" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q19" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q19" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q19" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q19" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q20" data-answer="D" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_020</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q20.png" alt="Questão S1_Q20" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q20" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q20" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q20" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q20" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q21" data-answer="A" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_021</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q21.png" alt="Questão S1_Q21" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q21" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q21" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q21" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q21" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q22" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_022</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q22.png" alt="Questão S1_Q22" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q22" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q22" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q22" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q22" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q24" data-answer="A" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_024</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q24.png" alt="Questão S1_Q24" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q24" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q24" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q24" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q24" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q25" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q25.png" alt="Questão S1_Q25" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q25" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q25" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q25" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q25" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S1_Q26" data-answer="C" data-source="S1" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S1_MAT_026</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s1_q26.png" alt="Questão S1_Q26" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q26" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q26" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q26" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S1_Q26" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q01" data-answer="D" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_001</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q01.png" alt="Questão S2_Q01" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q01" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q01" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q01" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q01" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q02" data-answer="D" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_002</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q02.png" alt="Questão S2_Q02" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q02" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q02" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q02" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q02" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q03" data-answer="C" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_003</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q03.png" alt="Questão S2_Q03" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q03" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q03" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q03" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q03" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q04" data-answer="D" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_004</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q04.png" alt="Questão S2_Q04" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q04" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q04" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q04" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q04" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q05" data-answer="B" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_005</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q05.png" alt="Questão S2_Q05" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q05" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q05" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q05" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q05" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q06" data-answer="B" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_006</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q06.png" alt="Questão S2_Q06" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q06" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q06" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q06" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q06" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q07" data-answer="B" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_007</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q07.png" alt="Questão S2_Q07" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q07" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q07" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q07" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q07" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q08" data-answer="A" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_008</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q08.png" alt="Questão S2_Q08" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q08" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q08" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q08" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q08" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q09" data-answer="B" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_009</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q09.png" alt="Questão S2_Q09" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q09" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q09" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q09" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q09" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q10" data-answer="D" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_010</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q10.png" alt="Questão S2_Q10" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q10" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q10" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q10" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q10" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q11" data-answer="B" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_011</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q11.png" alt="Questão S2_Q11" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q11" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q11" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q11" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q11" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q12" data-answer="A" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_012</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q12.png" alt="Questão S2_Q12" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q12" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q12" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q12" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q12" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q13" data-answer="A" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_013</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q13.png" alt="Questão S2_Q13" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q13" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q13" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q13" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q13" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q14" data-answer="A" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_014</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q14.png" alt="Questão S2_Q14" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q14" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q14" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q14" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q14" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q15" data-answer="C" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_015</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q15.png" alt="Questão S2_Q15" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q15" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q15" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q15" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q15" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q16" data-answer="B" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_016</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q16.png" alt="Questão S2_Q16" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q16" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q16" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q16" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q16" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q17" data-answer="D" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_017</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q17.png" alt="Questão S2_Q17" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q17" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q17" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q17" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q17" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q18" data-answer="A" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_018</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q18.png" alt="Questão S2_Q18" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q18" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q18" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q18" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q18" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q19" data-answer="D" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_019</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q19.png" alt="Questão S2_Q19" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q19" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q19" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q19" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q19" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q20" data-answer="C" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_020</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q20.png" alt="Questão S2_Q20" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q20" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q20" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q20" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q20" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q21" data-answer="D" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_021</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q21.png" alt="Questão S2_Q21" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q21" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q21" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q21" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q21" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q22" data-answer="C" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_022</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q22.png" alt="Questão S2_Q22" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q22" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q22" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q22" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q22" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q23" data-answer="B" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_023</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q23.png" alt="Questão S2_Q23" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q23" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q23" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q23" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q23" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q24" data-answer="D" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_024</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q24.png" alt="Questão S2_Q24" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q24" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q24" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q24" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q24" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q25" data-answer="A" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q25.png" alt="Questão S2_Q25" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q25" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q25" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q25" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q25" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S2_Q26" data-answer="C" data-source="S2" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S2_MAT_026</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s2_q26.png" alt="Questão S2_Q26" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q26" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q26" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q26" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S2_Q26" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q01" data-answer="A" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_001</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q01.png" alt="Questão S3_Q01" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q01" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q01" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q01" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q01" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q02" data-answer="C" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_002</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q02.png" alt="Questão S3_Q02" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q02" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q02" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q02" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q02" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q03" data-answer="B" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_003</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q03.png" alt="Questão S3_Q03" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q03" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q03" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q03" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q03" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q04" data-answer="A" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_004</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q04.png" alt="Questão S3_Q04" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q04" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q04" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q04" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q04" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q05" data-answer="C" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_005</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q05.png" alt="Questão S3_Q05" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q05" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q05" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q05" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q05" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q06" data-answer="C" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_006</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q06.png" alt="Questão S3_Q06" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q06" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q06" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q06" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q06" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q07" data-answer="B" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_007</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q07.png" alt="Questão S3_Q07" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q07" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q07" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q07" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q07" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q08" data-answer="C" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_008</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q08.png" alt="Questão S3_Q08" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q08" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q08" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q08" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q08" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q09" data-answer="B" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_009</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q09.png" alt="Questão S3_Q09" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q09" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q09" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q09" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q09" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q10" data-answer="C" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_010</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q10.png" alt="Questão S3_Q10" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q10" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q10" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q10" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q10" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q11" data-answer="A" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_011</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q11.png" alt="Questão S3_Q11" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q11" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q11" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q11" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q11" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q12" data-answer="A" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_012</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q12.png" alt="Questão S3_Q12" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q12" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q12" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q12" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q12" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q13" data-answer="B" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_013</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q13.png" alt="Questão S3_Q13" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q13" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q13" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q13" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q13" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q14" data-answer="C" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_014</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q14.png" alt="Questão S3_Q14" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q14" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q14" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q14" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q14" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q15" data-answer="A" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_015</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q15.png" alt="Questão S3_Q15" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q15" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q15" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q15" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q15" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q16" data-answer="D" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_016</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q16.png" alt="Questão S3_Q16" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q16" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q16" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q16" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q16" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q17" data-answer="B" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_017</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q17.png" alt="Questão S3_Q17" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q17" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q17" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q17" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q17" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q18" data-answer="A" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_018</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q18.png" alt="Questão S3_Q18" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q18" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q18" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q18" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q18" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q19" data-answer="B" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_019</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q19.png" alt="Questão S3_Q19" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q19" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q19" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q19" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q19" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q20" data-answer="A" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_020</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q20.png" alt="Questão S3_Q20" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q20" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q20" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q20" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q20" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q21" data-answer="D" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_021</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q21.png" alt="Questão S3_Q21" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q21" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q21" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q21" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q21" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q22" data-answer="A" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_022</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q22.png" alt="Questão S3_Q22" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q22" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q22" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q22" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q22" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q23" data-answer="C" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_023</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q23.png" alt="Questão S3_Q23" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q23" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q23" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q23" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q23" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q24" data-answer="D" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_024</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q24.png" alt="Questão S3_Q24" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q24" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q24" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q24" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q24" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q25" data-answer="B" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_025</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q25.png" alt="Questão S3_Q25" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q25" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q25" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q25" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q25" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    <article class="card" data-id="S3_Q26" data-answer="A" data-source="S3" hidden>
+      <header class="qhead">
+        <span class="num">Questão</span>
+        <span class="code">SAEB2025_S3_MAT_026</span>
+      </header>
+      <div class="stem"><p class="stem-note">Marque a alternativa correta com base na imagem da questão.</p></div>
+      <figure class="fig"><img src="imgs/s3_q26.png" alt="Questão S3_Q26" loading="lazy"></figure>
+      <div class="options">
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q26" value="A">
+          <span class="letter">A</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q26" value="B">
+          <span class="letter">B</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q26" value="C">
+          <span class="letter">C</span>
+          
+        </label>
+        <label class="opt letter-only">
+          <input type="radio" name="S3_Q26" value="D">
+          <span class="letter">D</span>
+          
+        </label></div>
+      <div class="feedback" hidden></div>
+    </article>
+    </form>
+
+    <section class="result" id="result">
+      <h2>Resultado</h2>
+      <div class="score"><span id="score">0</span> / <span id="scoreTotal">25</span></div>
+      <p id="scoreMsg"></p>
+    </section>
+
+    <footer class="note">
+      Fontes: Simulado SAEB 2026 (Mat.) e 1º, 2º e 3º Simulados SAEB 2025 SC — Matemática, 3ª série.
+      Questão 23 do 1º simulado 2025 foi anulada e não entra no banco.
+    </footer>
+  </div>
+<script>
+const TOTAL_PROVA = 25;
+const form = document.getElementById('quiz');
+const answeredEl = document.getElementById('answered');
+const result = document.getElementById('result');
+const scoreEl = document.getElementById('score');
+const scoreMsg = document.getElementById('scoreMsg');
+
+function visibleCards() {
+  return [...form.querySelectorAll('.card')].filter(c => !c.hidden);
+}
+
+function countAnswered() {
+  let n = 0;
+  visibleCards().forEach(card => {
+    if (card.querySelector('input:checked')) n++;
+  });
+  answeredEl.textContent = n;
+}
+
+form.addEventListener('change', countAnswered);
+
+function resetStyles() {
+  form.querySelectorAll('.card').forEach(card => {
+    card.classList.remove('is-correct', 'is-wrong');
+    const fb = card.querySelector('.feedback');
+    fb.hidden = true;
+    fb.className = 'feedback';
+    fb.textContent = '';
+    card.querySelectorAll('input[type=radio]').forEach(r => { r.checked = false; });
+  });
+  result.classList.remove('show');
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function novaProva() {
+  const all = [...form.querySelectorAll('.card')];
+  all.forEach(c => { c.hidden = true; });
+  resetStyles();
+  const picked = shuffle(all).slice(0, TOTAL_PROVA);
+  picked.forEach((card, i) => {
+    card.hidden = false;
+    card.querySelector('.num').textContent = 'Questão ' + (i + 1);
+    form.appendChild(card);
+  });
+  countAnswered();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('btnNew').addEventListener('click', () => {
+  if (confirm('Sortear uma nova prova com outras questões? As respostas atuais serão apagadas.')) {
+    novaProva();
+  }
+});
+
+document.getElementById('btnClear').addEventListener('click', () => {
+  resetStyles();
+  countAnswered();
+});
+
+document.getElementById('btnReveal').addEventListener('click', () => {
+  visibleCards().forEach(card => {
+    const ans = card.dataset.answer;
+    const fb = card.querySelector('.feedback');
+    fb.hidden = false;
+    fb.className = 'feedback ok';
+    fb.textContent = 'Gabarito: ' + ans;
+  });
+});
+
+document.getElementById('btnCheck').addEventListener('click', () => {
+  let score = 0, blank = 0;
+  const cards = visibleCards();
+  cards.forEach(card => {
+    const ans = card.dataset.answer;
+    const chosen = card.querySelector('input:checked');
+    const fb = card.querySelector('.feedback');
+    card.classList.remove('is-correct', 'is-wrong');
+    fb.hidden = false;
+    if (!chosen) {
+      blank++;
+      fb.className = 'feedback skip';
+      fb.textContent = 'Sem resposta. Gabarito: ' + ans;
+      return;
+    }
+    if (chosen.value === ans) {
+      score++;
+      card.classList.add('is-correct');
+      fb.className = 'feedback ok';
+      fb.textContent = 'Correto!';
+    } else {
+      card.classList.add('is-wrong');
+      fb.className = 'feedback bad';
+      fb.textContent = 'Incorreto. Você marcou ' + chosen.value + '. Gabarito: ' + ans;
+    }
+  });
+  scoreEl.textContent = score;
+  const total = cards.length || TOTAL_PROVA;
+  const pct = Math.round((score / total) * 100);
+  scoreMsg.textContent = blank
+    ? `Acertos: ${score} (${pct}%). Em branco: ${blank}.`
+    : `Acertos: ${score} (${pct}%).`;
+  result.classList.add('show');
+  result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+novaProva();
+</script>
+</body>
+</html>
